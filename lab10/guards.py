@@ -43,13 +43,43 @@ def _truth(ctx, order_id):
     return order, pol, parcel, delay
 
 
+def _safe_text_char_limit(ctx) -> int:
+    """Tính số ký tự tối đa cho ticket.text để tổng tiền LLM/ticket luôn nằm dưới ngân sách."""
+    facts = ctx.tools.ops_facts() or {}
+    price = facts.get("llm_cost") or {}
+    limits = ctx.tools.ops_limits() or {}
+    cfg_budget = (ctx.gates or {}).get("business", {}).get("cost_budget_per_ticket_vnd")
+    ceiling = limits.get("max_llm_cost_per_ticket_vnd")
+    budget = min(v for v in (cfg_budget, ceiling, 1500) if v is not None)
+    fixed = (
+        price.get("platform_per_ticket_vnd", 200)
+        + price.get("extract_base_vnd", 150)
+        + 2 * price.get("policy_check_vnd", 200)
+        + price.get("confirm_vnd", 100)
+        + price.get("decision_note_vnd", 100)
+    )
+    per4 = max(1, price.get("extract_per_4_chars_vnd", 1))
+    avail = max(100, budget - fixed)
+    return min(1000, avail * 4 // per4)
+
+
 def pre_guard(ctx):
-    """Cổng 1: ghim phiên bản chính sách đang hiệu lực theo ngày as_of."""
+    """Cổng 1 + Vòng 2: ghim chính sách hiệu lực theo as_of và rút gọn văn bản dài vượt ngân sách LLM."""
     pol = H.effective_policy(ctx.tools.lookup_policies(), ctx.as_of)
+    extra = {"policy_id": pol["policy_id"]} if pol else {}
     if pol:
         ctx.log("policy_pinned", policy_id=pol["policy_id"])
-        return Verdict.allow(policy_id=pol["policy_id"])
-    return Verdict.allow()
+
+    text = (ctx.ticket or {}).get("text") or ""
+    limit = _safe_text_char_limit(ctx)
+    if len(text) > limit:
+        head = max(200, (limit - 10) // 2)
+        tail = max(100, limit - 10 - head)
+        short = text[:head] + "\n...\n" + text[-tail:]
+        ctx.log("guard_text_rewritten", orig_len=len(text), new_len=len(short))
+        return Verdict.rewrite("rút gọn văn bản dài để nằm trong ngân sách LLM", short, **extra)
+
+    return Verdict.allow(**extra)
 
 
 def _guard_issue_refund(ctx, action):
