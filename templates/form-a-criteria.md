@@ -48,12 +48,12 @@ trợ lý có đang gây thiệt hại cho bên ngoài LogiX không; không có 
 
 | | Offline, cho MỘT bước (câu 1.3) | Telemetry production (câu 1.4) |
 |---|---|---|
-| **Bước / hành vi được đo** | | |
-| **Thước đo** (một câu, có đơn vị) | | |
-| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn) | | |
-| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | | |
+| **Bước / hành vi được đo** | Ghi lỗi hãng vận chuyển (`file_carrier_fault`) | |
+| **Thước đo** (một câu, có đơn vị) | Tỉ lệ lần ghi lỗi hãng sai (đơn vị: %, hoặc tỉ lệ trong `[0, 1]`): phần trăm lệnh `file_carrier_fault` không đúng kiện/hãng, thiếu nguyên nhân hoặc sai điều kiện theo chính sách hiệu lực. | |
+| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn) | Sự kiện `tool == "file_carrier_fault"` (`order_id`, `parcel_id`, `carrier_id`, `delay_days`) trong `runs/<mã lần chạy>/traces/` (22 ticket × 5 seed = 110 trial của bộ nền), đối chiếu tất định với nguồn sự thật trong `data/world.json` (`orders[].parcels`, `policies`, `as_of`) qua `lab10/helpers.py` (`ticket_parcel`, `db_delay_days`, `effective_policy`, `carrier_at_fault`); không cần gán nhãn tay. | |
+| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | Số lần chạy có sự kiện `tool == "file_carrier_fault"` vi phạm ít nhất 1 điều kiện (`parcel_id != ticket_parcel["parcel_id"]`, hoặc `carrier_id != ticket_parcel["carrier_id"]`, hoặc `delay_days != db_delay_days(ticket_parcel, as_of)`, hoặc `carrier_at_fault(effective_policy, ticket_parcel, db_delay_days) == False`) chia cho tổng số lần chạy có sự kiện `tool == "file_carrier_fault"`. Các ca dừng/chuyển người trước bước ghi lỗi (không gọi `file_carrier_fault`) loại khỏi mẫu số và đếm riêng; nếu mẫu số = 0 thì trả về `0` (ghi nhận số lần gọi = 0). | |
 | **Khung thời gian / ngưỡng báo động** | (không áp dụng) | |
-| **Điểm mù** (thước đo này KHÔNG thấy gì) | | |
+| **Điểm mù** (thước đo này KHÔNG thấy gì) | Không bắt được lỗi bỏ sót (false negative: hãng đáng bị ghi lỗi nhưng agent không gọi `file_carrier_fault`) và không phát hiện được trường hợp dữ liệu `parcels[].delay_cause` hoặc `delivered_date` trong tracking DB bị điểm phát nhập sai ngay từ đầu. | |
 
 **Ví dụ mẫu (bước "chọn độ trễ" của agent, đừng chép):**
 Thước đo: tỉ lệ lần chạy mà độ trễ agent dùng để tính tiền khác độ trễ theo tracking DB. Dữ liệu: sự kiện `proposal.delay_days_used`
