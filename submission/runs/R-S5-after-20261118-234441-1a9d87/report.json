@@ -1,7 +1,7 @@
 {
-  "run_id": "R-S5-after-20261118-232105-f25da3",
+  "run_id": "R-S5-after-20261118-234441-1a9d87",
   "note": "lab10.grade S5: mốc after (sau khi sửa)",
-  "code_hash": "f25da3fbb6c4f5bd487329fcafd295e9864d18f0ec800641bb769dcfaa8a75a3",
+  "code_hash": "1a9d87e33bcbac4adbffacc4a5c22e96793ba64c33ed2c7ad8ff88601a9ad688",
   "suite": "S5",
   "stage": "after",
   "trials": 90,
