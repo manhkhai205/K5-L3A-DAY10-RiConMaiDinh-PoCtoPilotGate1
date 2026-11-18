@@ -105,8 +105,8 @@ Giải thích một câu:Y chỉ hơn X đúng 1/50 lần chạy, và 1,0 của 
 
 Đây không phải ngưỡng chất lượng. Viết hai câu trên phiếu này thôi, không chép vào `acceptance_criteria.json`.
 
-- Một đầu ra hoặc hành động bị cấm (ví dụ không bao giờ hoàn quá X đồng): ____
-- Ngưỡng chuyển cho người duyệt: ____
+- Một đầu ra hoặc hành động bị cấm (ví dụ không bao giờ hoàn quá X đồng): Trợ lý không bao giờ tự hoàn quá 300.000đ cho một khách trong một ngày, không ghi lỗi cho hãng khi tracking không có nguyên nhân, và không bao giờ nói trong reply một số tiền khác số đã ghi trong sổ cái (FM-08 của PRD v1.1).
+- Ngưỡng chuyển cho người duyệt: khoản hoàn làm tổng hoàn tự động trong ngày vượt 2.000.000đ, hoặc lỗi thứ 3 trở đi của cùng một hãng trong ngày, hoặc khách đã nhận quá 300.000đ trong ngày → chuyển cho chị Hạnh (NV-HANH) duyệt, phải có người nhận trong 60 phút.
 
 #### Bước 2 · Soát từng câu
 
