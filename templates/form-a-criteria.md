@@ -1,6 +1,6 @@
 # Phiếu A · Tiêu chí và cách đo · Khối 1 (phút 15–65)
 
-**Bàn:** ______ · **Người cầm bút chính:** vai Sản phẩm và kinh doanh (câu 1.3: Kỹ sư cổng; câu 1.2, 1.4: Vận hành và pháp lý)
+**Bàn:** K5-L3A-DAY10-RiConMaiDinh-PoCtoPilotGate1 · **Người cầm bút chính:** vai Sản phẩm và kinh doanh (câu 1.3: Kỹ sư cổng; câu 1.2, 1.4: Vận hành và pháp lý)
 
 Điền phiếu này **trước khi chạy trợ lý lần nào**. Viết xong thì chép ngưỡng sang `config/acceptance_criteria.json`, ký ở phút 60–65,
 rồi mới chạy đánh giá. Khối 1 không sửa code.
@@ -24,8 +24,8 @@ rồi mới chạy đánh giá. Khối 1 không sửa code.
 
 ### Câu 1.2 · Mục tiêu nhìn từ hai người
 
-- Chị Oanh, kế toán đối soát (không dùng trợ lý, nhưng phải khớp sổ với hãng và shop mỗi tuần): …
-- Chị Hạnh, trưởng ca CSKH (phải duyệt những ca trợ lý chuyển sang): …
+- Chị Oanh, kế toán đối soát (không dùng trợ lý, nhưng phải khớp sổ với hãng và shop mỗi tuần): Vì trợ lý theo PRD v1.1 (§2, §6) mới kiểm trên `MockLLM` và chưa đối soát thực tế, 100% bút toán hoàn tiền trên sổ cái (đúng số tiền, đúng bên chịu trả `LOGIX`/`MERCHANT`, đúng mã phê duyệt hợp lệ) và mọi biên bản lỗi hãng do trợ lý ghi phải khớp chứng từ thực tế, không phát sinh hoàn sai, lệch lời nhắn với sổ cái hay ghi lỗi oan khiến hãng vận chuyển và shop khiếu nại khi chốt sổ hàng tuần (`NV-OANH`).
+- Chị Hạnh, trưởng ca CSKH (phải duyệt những ca trợ lý chuyển sang): Theo đúng ranh giới phạm vi ở PRD v1.1 (§2), trợ lý chỉ chuyển sang hàng chờ duyệt những ca thật sự cần phán quyết của con người (vượt hạn mức tự động, thiếu phê duyệt hợp lệ hoặc ngoài phạm vi pilot) kèm đủ căn cứ/ghi chú rõ ràng để chị Hạnh (`NV-HANH`) nhận xử lý kịp SLA 60 phút với công suất 6 ca/giờ/người, không làm ngập hàng chờ giờ cao điểm và không phải đứng tên chịu trách nhiệm cho các khoản hoàn dùng phê duyệt không hợp lệ.
 
 ---
 
@@ -48,12 +48,12 @@ trợ lý có đang gây thiệt hại cho bên ngoài LogiX không; không có 
 
 | | Offline, cho MỘT bước (câu 1.3) | Telemetry production (câu 1.4) |
 |---|---|---|
-| **Bước / hành vi được đo** | | |
-| **Thước đo** (một câu, có đơn vị) | | |
-| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn) | | |
-| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | | |
-| **Khung thời gian / ngưỡng báo động** | (không áp dụng) | |
-| **Điểm mù** (thước đo này KHÔNG thấy gì) | | |
+| **Bước / hành vi được đo** | | Ghi nhận lỗi giao trễ và gửi thông báo cho bên thứ ba là hãng vận chuyển (`file_carrier_fault` và `notify_carrier`) |
+| **Thước đo** (một câu, có đơn vị) | | Tỉ lệ (%) biên bản lỗi hãng vận chuyển do trợ lý tạo bị hãng gửi khiếu nại bác bỏ hoặc bị kế toán đối soát (`NV-OANH`) đảo bút toán trên tổng số biên bản lỗi trợ lý đã ghi trong kỳ. |
+| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn) | | Không có nhãn ground-truth trong production; dùng tín hiệu đối chứng từ bảng nhật ký lỗi `faults` (theo `carrier_id`, `order_id`, `parcel_id`) đối chiếu với kênh khiếu nại của hãng vận chuyển và kết quả đối soát tuần của chị Oanh (`NV-OANH`) trên 100% ca trợ lý đã ghi lỗi. |
+| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | | `(Số biên bản lỗi do trợ lý ghi bị hãng khiếu nại bác bỏ hoặc kế toán hủy khi đối soát) / (Tổng số biên bản lỗi trợ lý đã xuất trong các ca đã đến kỳ đối soát) × 100%`. Ca mới phát sinh chưa qua hạn đối soát hoặc đang chờ hãng phản hồi được tách khỏi mẫu số kỳ hiện tại và theo dõi ở kỳ sau; nếu mẫu số = 0 thì ghi `"N/A (0 lượt ghi lỗi)"`. |
+| **Khung thời gian / ngưỡng báo động** | (không áp dụng) | Theo dõi cuốn chiếu 24 giờ và tổng hợp theo chu kỳ 7 ngày (khớp ngưỡng đình chỉ `suspend_after_strikes_7d` của các hãng, như `GHSH`/`DNB` là 3 lỗi/7 ngày). Ngưỡng vàng: > 0% (≥ 1 ca bị hãng bác bỏ trong 24h) → báo ngay `NV-OANH` và `NV-TUNG` rà soát; Ngưỡng đỏ: ≥ 2 ca/ngày hoặc có hãng chạm ngưỡng cảnh báo đình chỉ 7 ngày → dừng tự động `file_carrier_fault`. |
+| **Điểm mù** (thước đo này KHÔNG thấy gì) | | (1) Có độ trễ từ lúc ghi lỗi đến khi hãng phát hiện và khiếu nại (nhất là với lỗi nhỏ hoặc hãng lớn ít rà ngay như `VNX`); (2) Không thấy các thiệt hại bên ngoài không đi qua bảng `faults`, như lộ thông tin cá nhân người nhận sang hãng qua `notify_carrier`, hoàn trừ nhầm ví `MERCHANT` mà shop chưa phản ánh, hoặc hoàn thừa khiến LogiX chịu lỗ. |
 
 **Ví dụ mẫu (bước "chọn độ trễ" của agent, đừng chép):**
 Thước đo: tỉ lệ lần chạy mà độ trễ agent dùng để tính tiền khác độ trễ theo tracking DB. Dữ liệu: sự kiện `proposal.delay_days_used`
