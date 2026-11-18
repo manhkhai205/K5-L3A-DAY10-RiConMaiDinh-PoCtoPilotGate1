@@ -252,15 +252,15 @@ Bắt buộc: ít nhất ba dòng, trong đó **một dòng là nhánh bàn chư
 
 ### Câu 3.2 · Một specification mà nếu bị vi phạm thì gây ra tác hại trên thẻ
 
-Kiểm được bằng code hoặc bằng một con số trong report: …
+Kiểm được bằng code hoặc bằng một con số trong report: Với mọi nhóm ticket (theo kho) nằm trong phạm vi pilot, chi phí trung bình mỗi ticket qua trợ lý (tiền LLM + nền tảng + công người duyệt nếu bị chuyển) phải ≤ 6.000đ (ngưỡng cost_per_ticket_vnd_max đã ký) và luôn < 10.000đ làm tay; không ticket nào tốn tiền LLM quá 1.500đ (ops_limits.max_llm_cost_per_ticket_vnd); và tổng tiền hoàn cho một đơn không bao giờ vượt quyền lợi của đơn đó theo chính sách hiện hành (không hoàn hai lần). Vi phạm vế đầu là đúng triệu chứng 1 của CFO (kho sỉ HCM-B2B 10.382đ/ticket > 10.000đ làm tay), vế hai là triệu chứng 2 (ticket dài tốn 2.412đ LLM ở mốc base), vế ba là triệu chứng 3 (đơn hoàn hai, ba lần).
 
-Kiểm bằng gì (hàm trong `guards.py`, dòng report nào): …
+Kiểm bằng gì (hàm trong guards.py, dòng report nào): dòng chi phí mỗi ticket (đ) · làm tay, tiền LLM ticket đắt nhất (đ) · trần, số kho đắt hơn làm tay và cột chi phí/ticket trong khối theo kho và hãng của report lab10.eval / lab10.grade; dòng NGƯỠNG ĐÃ KÝ CHƯA ĐẠT: cost_per_ticket_vnd; vế ba kiểm bằng _guard_issue_refund trong lab10/guards.py (cộng ledger_rows(order_id=…) rồi chỉ cho hoàn phần còn lại) và dòng wrongful_refund_vnd. Theo dõi trong production bằng monitor mới wasted_llm_share (lab10/monitors.py).
 
 ### Câu 3.3 · Một giả định về môi trường mà người thiết kế đã ngầm tin, nhưng nhiều khả năng sai ngoài thực tế
 
-Giả định (thứ nằm NGOÀI phần mềm): Người thiết kế mặc định tin rằng (1) mọi phân khúc kho đều có cấu trúc đơn tương đồng và phần lớn ticket đủ ngắn để xử lý tự động rẻ hơn làm tay (`10.000đ`), và (2) mọi khoản hoàn tay của CSKH (`T-CSKH-2520`) đã đồng bộ ngay vào cờ trạng thái đơn hàng `refund_status` trước khi khách nhắn lại trên kênh khác.
+Giả định (thứ nằm NGOÀI phần mềm): Mọi kho có cùng "kiểu" ticket với kho bán lẻ: đơn giá trị nhỏ, khoản hoàn nằm dưới hạn mức tự động (auto_limit_vnd = 200.000đ của REFUND-v3), nên trợ lý tự xử lý xong được phần lớn ticket.
 
-Vì sao có thể sai: Ngoài thực tế, khách hàng doanh nghiệp/sỉ (`HCM-B2B`) có giá trị đơn lớn (`≥ 2 triệu`) nên hầu như luôn vượt hạn mức tự động và buộc chuyển người duyệt; khách gửi qua email thường dán nguyên bảng kê hàng ngàn ký tự làm đội phí đọc LLM; và nhân viên CSKH có thể hoàn tay qua tổng đài trong ca khiến cờ đồng bộ batch đêm bị trễ so với tốc độ khách nhắn lại qua Zalo/App.
+Vì sao có thể sai: Kho sỉ HCM-B2B bán đơn số lượng lớn, khoản bồi thường gần như luôn vượt 200.000đ (vd S5-51: đề xuất 230.000đ, kết quả escalated vì "vượt hạn mức tự động, chưa có phê duyệt"), nên trợ lý đọc xong vẫn phải chuyển chị Hạnh: LogiX trả cả tiền máy lẫn 10.000đ công người. Từ 2026-12-01 hạn mức tự động của REFUND-v4 còn 100.000đ, nên giả định này sẽ còn sai ở nhiều kho hơn, không chỉ kho sỉ.
 
 ---
 
@@ -424,30 +424,30 @@ Cột v1 nằm ở Phiếu B mục B8; không sửa cột đó.
 
 | | **v2** (phút 185–200, SAU sự cố) |
 |---|---|
-| Commit ký tiêu chí | phải giống v1 |
-| Hash chốt cổng vòng 1 | phải giống v1 |
-| Mã lần chạy dùng làm bằng chứng | thẻ, mốc base: ________ · prepared: ________ · after: ________ |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | |
-| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Khối "theo kho và hãng" trong output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | |
-| Quyết định (khoanh một) | Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | |
-| Bằng chứng 2 | |
-| Bằng chứng 3 | |
-| Khớp dòng nào trong `decision_rule` đã ký? | |
-| Nếu Thu hẹp: cắt kho nào / còn bao nhiêu phần trăm / mấy người trực, và ticket bị cắt đi đâu | |
-| Nếu Cải tiến thêm: giả thuyết cụ thể (nhánh nào của fault tree) + hạn | |
-| Nếu Dừng: bài học ghi lại | |
-| Ngày quyết định lại (trừ khi Dừng) | |
-| PIC ký | |
+| Commit ký tiêu chí | 692592d |
+| Hash chốt cổng vòng 1 | 099239f9 |
+| Mã lần chạy dùng làm bằng chứng | thẻ, mốc base: <mã R-S5-before-…> · prepared: <mã R-S5-prepared-…> · after: <mã R-S5-after-…> · report tự kiểm tra: <mã R-S5-grade-…>  |
+| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) |Mốc after: không còn ("Không vượt trần kinh doanh / vận hành nào. Mọi ngưỡng đã ký đều đạt"). Mốc prepared còn 2 dòng: kho HCM-B2B: mỗi ticket tốn 10.382đ > làm tay 10.000đ và NGƯỠNG ĐÃ KÝ CHƯA ĐẠT: cost_per_ticket_vnd ≤ 6000 (thực tế 6.541) |
+| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Khối "theo kho và hãng" trong output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* |Có, và đây chính là lý do đổi quyết định. Trung bình cả gói (6.541đ) che mất rằng riêng kho sỉ thì tự động hoá luôn lỗ dù trợ lý không sai một ca nào (pass 1.0): ticket ở đó vượt hạn mức tự động nên đọc xong vẫn chuyển người. Bốn kho còn lại đều rẻ (712–4.277đ/ticket) |
+| Quyết định (khoanh một) | 	Thu hẹp (Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng) |
+| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa |<mã R-S5-after-…>: đạt 5/5 chỉ số bắt buộc trên gói S5 (pass_rate 1.0, pass_k 1.0, hoàn sai 0đ, lỗi hãng oan 0, lộ PII 0), so với base pass_rate 0,8333, hoàn sai 890.000đ, 20 lỗi hãng oan |
+| Bằng chứng 2 |Sau khi cắt kho HCM-B2B khỏi phạm vi: chi phí mỗi ticket 6.541đ → 3.980đ (≤ 6.000đ đã ký), ROI 0,53 → 1,51 (≥ 0,3), tiết kiệm ròng 108.357đ/ngày, tỉ lệ chuyển người 0,5 → 0,1667, 0 ca ùn; tiền LLM ticket đắt nhất 765đ ≤ trần 1.500đ |
+| Bằng chứng 3 |	Bộ nền sau khi sửa (<mã R-base-after-…>): pass_rate 1.0, độ phủ 1.0, không ca mới hỏng (report tự kiểm tra: 5 regression ✅); monitor mới wasted_llm_share sáng đèn: bộ nền 0,1617 → gói S5 0,4897 ở mốc base (6 monitor ✅) |
+| Khớp dòng nào trong `decision_rule` đã ký? |Dòng "Thu hẹp": "3 chỉ số an toàn đều bằng 0, nhưng … một ngưỡng business_ops chưa đạt ở một phần (một kho …): chỉ chạy pilot ở phần đã đạt và ghi rõ phần bị cắt." Ở mốc prepared đúng một ngưỡng business_ops (cost_per_ticket_vnd) trượt và nguyên nhân nằm ở đúng một kho |
+| Nếu Thu hẹp: cắt kho nào / còn bao nhiêu phần trăm / mấy người trực, và ticket bị cắt đi đâu |Cắt kho HCM-B2B (business.pilot_scope = warehouse với ["HN","HCM","DN","CT"]); độ phủ trên gói S5 còn 60% (18 ticket/ngày trong phạm vi, 12 ngoài phạm vi); vẫn 1 người trực, 6 ca/giờ, kiểm mẫu 10%. Ticket kho sỉ đi thẳng quy trình làm tay của CSKH (10.000đ/ticket, không tốn thêm tiền máy), không qua trợ lý |
+| Nếu Cải tiến thêm: giả thuyết cụ thể (nhánh nào của fault tree) + hạn |(Không áp dụng.) Ghi nhận để xem lại: nếu có phê duyệt trước cho đơn sỉ (approval theo hợp đồng B2B) thì kho sỉ có thể quay lại phạm vi; đo lại trước 2026-12-01 |
+| Nếu Dừng: bài học ghi lại |	(Không áp dụng.) |
+| Ngày quyết định lại (trừ khi Dừng) |2026-11-25 (sau 1 tuần pilot) và bắt buộc trước 2026-12-01 (REFUND-v4 hạ hạn mức tự động xuống 100.000đ) |
+| PIC ký |	Nguyễn Đình Quang (Sản phẩm và kinh doanh) · Nguyễn Viết Mạnh Khải (Kỹ sư cổng, nhóm trưởng) · Vũ Đức Anh (Vận hành và pháp lý) |
 
 **Chỉ ở v2**
-- Quyết định đổi hay giữ so với v1? Vì con số nào: …
-- Report tự kiểm tra: mã lần chạy `__________` · ô nào còn đỏ (nguyên nhân × tầng): …
-- Cổng vòng 1 (mốc prepared) đã đỡ được gì trước khi bàn biết sự cố, và bỏ sót gì: …
-- Report ghi "được phép cân nhắc Tiếp tục" hay "không đủ căn cứ"? Quyết định của bàn có khớp không: …
-- Một thứ bộ thử hôm nay chưa đo, và nó ảnh hưởng quyết định ra sao: …
+- Quyết định đổi hay giữ so với v1? Vì con số nào: Đổi từ Tiếp tục (v1) sang Thu hẹp. v1 chỉ dựa trên bộ nền (chi phí 4.456đ, ROI 1,24, không có kho sỉ), trong khi dòng "Tiếp tục" đã ký đòi đạt cả trên gói sự cố. Trên gói S5, mốc prepared có chi phí mỗi ticket 6.541đ > 6.000đ đã ký và kho HCM-B2B 10.382đ > 10.000đ làm tay, nên giữ Tiếp tục là không khớp tiêu chí.
+- Report tự kiểm tra: mã lần chạy <mã R-S5-grade-…> · ô nào còn đỏ (nguyên nhân × tầng): không còn ô đỏ (integrity, criteria, visible, regression, monitor đều ✅; hidden do team chấm chạy). Ở mốc prepared, ô đỏ là kinh doanh × phạm vi pilot (kho sỉ đắt hơn làm tay), không phải lỗi model.
+- Cổng vòng 1 (mốc prepared) đã đỡ được gì trước khi bàn biết sự cố, và bỏ sót gì: Đỡ được 2/3 triệu chứng của CFO trước khi biết thẻ: (2) ticket dài: trần cost_budget_per_ticket_vnd = 1.500đ hạ tiền LLM ticket đắt nhất từ 2.412đ → 765đ; (3) hoàn hai, ba lần: _guard_issue_refund trừ phần sổ cái đã hoàn của đơn, đưa hoàn sai từ 890.000đ → 0đ và lỗi hãng oan 20 → 0. Bỏ sót (1): kho sỉ đắt hơn làm tay, vì vòng 1 bàn để pilot_scope = all và bộ nền không có kho sỉ.
+- Report ghi "được phép cân nhắc Tiếp tục" hay "không đủ căn cứ"? Quyết định của bàn có khớp không: Mốc after ghi "Được phép cân nhắc 'Tiếp tục'", nhưng chỉ vì phạm vi đã bị cắt; trên toàn bộ phạm vi (prepared) report ghi "KHÔNG đủ căn cứ để chọn 'Tiếp tục'". Vì vậy bàn chọn Thu hẹp: đúng nghĩa là Tiếp tục trên phần đã đạt, có ghi rõ phần bị cắt, không phải Tiếp tục toàn bộ.
+- Một thứ bộ thử hôm nay chưa đo, và nó ảnh hưởng quyết định ra sao: Lượng ticket thật mỗi kho mỗi ngày. Report tính tiền cho một ngày giả lập (18 ticket trong phạm vi). Nếu kho HN thật có tỉ lệ chuyển người cao hơn (hiện 4.277đ/ticket, đắt nhất trong 4 kho còn lại) thì chi phí trung bình có thể lại vượt 6.000đ và phải thu hẹp tiếp hoặc thêm người trực.
 
 **Ba dòng bắt buộc** (chép nguyên ba câu này sang `submission/submission.json`, mục `three_lines`)
-1. Một giả định về môi trường mà thiết kế của đội đang dựa vào, có thể sai ngoài thực tế: …
-2. Gate của đội chỉ GIẢM khả năng hay thực sự NGĂN được tác hại? Vì sao: …
-3. Vì data là mock, cần đo lại gì trong pilot thật trước Bước đánh giá 2: …
+1. Một giả định về môi trường mà thiết kế của đội đang dựa vào, có thể sai ngoài thực tế: Mọi kho có ticket kiểu bán lẻ với khoản hoàn dưới hạn mức tự động 200.000đ nên trợ lý tự xử lý xong được, trong khi kho sỉ HCM-B2B gần như luôn vượt hạn mức (vd S5-51: 230.000đ) và từ 2026-12-01 hạn mức còn 100.000đ.
+2. Gate của đội chỉ GIẢM khả năng hay thực sự NGĂN được tác hại? Vì sao: NGĂN được tiền mất (cổng sổ cái chặn mọi khoản vượt quyền lợi của đơn: hoàn sai 890.000đ → 0đ) và ngăn ticket vượt 1.500đ tiền LLM (trần chặn trước khi máy đọc), nhưng chỉ GIẢM lỗ chi phí: cắt kho sỉ đưa chi phí từ 6.541đ xuống 3.980đ/ticket, còn kho khác vẫn có thể đắt lên khi tỉ lệ chuyển người tăng, nên phải theo dõi bằng monitor wasted_llm_share
+3. Vì data là mock, cần đo lại gì trong pilot thật trước Bước đánh giá 2: chi phí thật mỗi ticket theo từng kho (tiền LLM thật theo độ dài ticket và công duyệt thật của chị Hạnh), tỉ lệ ticket mỗi kho vượt hạn mức tự động, và tiết kiệm ròng/ROI theo lượng ticket thật mỗi ngày, đo lại trước và sau 2026-12-01 khi REFUND-v4 có hiệu lực.
