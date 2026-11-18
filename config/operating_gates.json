@@ -19,7 +19,7 @@
     "stop_conditions": [
       "Có từ 1 ca hoàn sai tiền hoặc 1 ca lộ PII ra bên thứ ba sau cổng kiểm tra: tắt ngay công tắc issue_refund hoặc notify_carrier tương ứng.",
       "Có từ 2 lỗi ghi oan cho hãng trong ngày hoặc hãng nhỏ (GHSH, DNB) gần chạm ngưỡng đình chỉ 7 ngày (3 lỗi): tắt công tắc file_carrier_fault.",
-      "Hàng chờ vượt SLA 60 phút (queue_stuck > 0) hoặc chi phí/ticket vượt 6.000đ: gọi thêm người duyệt hoặc thu hẹp phạm vi pilot."
+      "Hàng chờ vượt SLA 60 phút (queue_stuck > 0), chi phí/ticket vượt 6.000đ, hoặc có kho chi phí/ticket vượt 10.000đ (đắt hơn làm tay): gọi thêm người duyệt hoặc cắt ngay kho đó khỏi business.pilot_scope."
     ],
     "alert_channel": "#logix-pilot-ops-alerts",
     "decision_note": true,
