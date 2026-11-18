@@ -1,6 +1,6 @@
 # Phiếu A · Tiêu chí và cách đo · Khối 1 (phút 15–65)
 
-**Bàn:** ______ · **Người cầm bút chính:** vai Sản phẩm và kinh doanh (câu 1.3: Kỹ sư cổng; câu 1.2, 1.4: Vận hành và pháp lý)
+**Bàn:** K5-L3A-DAY10-RiConMaiDinh-PoCtoPilotGate1 · **Người cầm bút chính:** vai Sản phẩm và kinh doanh (câu 1.3: Kỹ sư cổng; câu 1.2, 1.4: Vận hành và pháp lý)
 
 Điền phiếu này **trước khi chạy trợ lý lần nào**. Viết xong thì chép ngưỡng sang `config/acceptance_criteria.json`, ký ở phút 60–65,
 rồi mới chạy đánh giá. Khối 1 không sửa code.
@@ -24,8 +24,8 @@ rồi mới chạy đánh giá. Khối 1 không sửa code.
 
 ### Câu 1.2 · Mục tiêu nhìn từ hai người
 
-- Chị Oanh, kế toán đối soát (không dùng trợ lý, nhưng phải khớp sổ với hãng và shop mỗi tuần): …
-- Chị Hạnh, trưởng ca CSKH (phải duyệt những ca trợ lý chuyển sang): …
+- Chị Oanh, kế toán đối soát (không dùng trợ lý, nhưng phải khớp sổ với hãng và shop mỗi tuần): Vì trợ lý theo PRD v1.1 (§2, §6) mới kiểm trên `MockLLM` và chưa đối soát thực tế, 100% bút toán hoàn tiền trên sổ cái (đúng số tiền, đúng bên chịu trả `LOGIX`/`MERCHANT`, đúng mã phê duyệt hợp lệ) và mọi biên bản lỗi hãng do trợ lý ghi phải khớp chứng từ thực tế, không phát sinh hoàn sai, lệch lời nhắn với sổ cái hay ghi lỗi oan khiến hãng vận chuyển và shop khiếu nại khi chốt sổ hàng tuần (`NV-OANH`).
+- Chị Hạnh, trưởng ca CSKH (phải duyệt những ca trợ lý chuyển sang): Theo đúng ranh giới phạm vi ở PRD v1.1 (§2), trợ lý chỉ chuyển sang hàng chờ duyệt những ca thật sự cần phán quyết của con người (vượt hạn mức tự động, thiếu phê duyệt hợp lệ hoặc ngoài phạm vi pilot) kèm đủ căn cứ/ghi chú rõ ràng để chị Hạnh (`NV-HANH`) nhận xử lý kịp SLA 60 phút với công suất 6 ca/giờ/người, không làm ngập hàng chờ giờ cao điểm và không phải đứng tên chịu trách nhiệm cho các khoản hoàn dùng phê duyệt không hợp lệ.
 
 ---
 
