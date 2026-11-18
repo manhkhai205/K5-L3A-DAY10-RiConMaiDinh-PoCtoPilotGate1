@@ -10,7 +10,7 @@
   "decision_v2": "Thu hẹp",
   "three_lines": {
     "environment_assumption": "Mọi kho có ticket kiểu bán lẻ với khoản hoàn dưới hạn mức tự động 200.000đ nên trợ lý tự xử lý xong được, trong khi kho sỉ HCM-B2B gần như luôn vượt hạn mức (vd S5-51: 230.000đ) và từ 2026-12-01 hạn mức còn 100.000đ.",
-    "reduce_or_prevent": "NGĂN được tiền mất (cổng sổ cái chặn mọi khoản vượt quyền lợi của đơn: hoàn sai 890.000đ → 0đ) và ngăn ticket vượt 1.500đ tiền LLM (trần chặn trước khi máy đọc), nhưng chỉ GIẢM lỗ chi phí: cắt kho sỉ đưa chi phí từ 6.541đ xuống 3.980đ/ticket, còn kho khác vẫn có thể đắt lên khi tỉ lệ chuyển người tăng, nên phải theo dõi bằng monitor wasted_llm_share.",
+    "reduce_or_prevent": "NGĂN được tiền mất (cổng sổ cái chặn mọi khoản vượt quyền lợi của đơn: hoàn sai 890.000đ → 0đ) và ngăn ticket vượt 1.500đ tiền LLM (pre_guard cắt gọn văn bản dài và trần ngân sách chặn trước khi đọc: max 998đ), nhưng chỉ GIẢM lỗ chi phí: cắt kho sỉ đưa chi phí từ 6.541đ xuống 2.446đ/ticket (ROI 3.09), còn kho khác vẫn có thể đắt lên khi tỉ lệ chuyển người tăng, nên phải theo dõi bằng monitor wasted_llm_share và max_warehouse_cost_per_ticket_vnd.",
     "measure_in_pilot": "Chi phí thật mỗi ticket theo từng kho (tiền LLM thật theo độ dài ticket và công duyệt thật của chị Hạnh), tỉ lệ ticket mỗi kho vượt hạn mức tự động, và tiết kiệm ròng/ROI theo lượng ticket thật mỗi ngày, đo lại trước và sau 2026-12-01 khi REFUND-v4 có hiệu lực."
   }
 }
